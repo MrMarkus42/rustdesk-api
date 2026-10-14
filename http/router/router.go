@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lejianwen/rustdesk-api/v2/global"
 	"github.com/lejianwen/rustdesk-api/v2/http/controller/web"
-	"net/http"
 )
 
 func WebInit(g *gin.Engine) {
@@ -16,8 +15,8 @@ func WebInit(g *gin.Engine) {
 	}
 
 	if global.Config.App.WebClient == 1 {
-		g.StaticFS("/webclient", http.Dir(global.Config.Gin.ResourcesPath+"/web"))
-		g.StaticFS("/webclient2", http.Dir(global.Config.Gin.ResourcesPath+"/web2"))
+		g.StaticFS("/webclient", gin.Dir(global.Config.Gin.ResourcesPath+"/web", false))
+		g.StaticFS("/webclient2", gin.Dir(global.Config.Gin.ResourcesPath+"/web2", false))
 	}
-	g.StaticFS("/_admin", http.Dir(global.Config.Gin.ResourcesPath+"/admin"))
+	g.StaticFS("/_admin", gin.Dir(global.Config.Gin.ResourcesPath+"/admin", false))
 }
