@@ -1,5 +1,3 @@
-//go:build ignore
-
 package main
 
 //go:generate swag init -g cmd/apimain.go --output docs/api --instanceName api --exclude http/controller/admin
