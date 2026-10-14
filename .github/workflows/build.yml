@@ -32,6 +32,10 @@ on:
       - 'v*.*.*'  # 当推送带有版本号的 tag（例如 v1.0.0）时触发工作流
       - 'test*'
 
+permissions:
+  contents: write # GitHub release upload
+  packages: write # push to ghcr.io
+
 env:
   LATEST_TAG: latest
   WEBCLIENT_SOURCE_LOCATION: ${{ github.event.inputs.WEBCLIENT_SOURCE_LOCATION || 'https://github.com/lejianwen/rustdesk-api-web' }}
