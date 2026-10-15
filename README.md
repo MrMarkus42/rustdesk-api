@@ -1,6 +1,8 @@
+**Deutsch** · [English](README.en.md)
+
 # RustDesk API
 
-In Go geschriebene API für selbst gehostete [RustDesk](https://rustdesk.com)-Server, mit Admin-Oberfläche und Web-Client. Sie bildet die Schnittstellen nach, die der RustDesk-Client für Anmeldung, Adressbuch und Geräteverwaltung nutzt.
+In Go geschriebene API für selbst gehostete [RustDesk](https://rustdesk.com)-Server, mit Admin-Oberfläche. Sie bildet die Schnittstellen nach, die der RustDesk-Client für Anmeldung, Adressbuch und Geräteverwaltung nutzt.
 
 Dieser Fork baut auf [lejianwen/rustdesk-api](https://github.com/lejianwen/rustdesk-api) (v2.7) auf, der nicht mehr gepflegt wird. Er wird zusammen mit [MrMarkus42/rustdesk-server](https://github.com/MrMarkus42/rustdesk-server) als s6-Image ausgeliefert.
 
@@ -8,7 +10,6 @@ Dieser Fork baut auf [lejianwen/rustdesk-api](https://github.com/lejianwen/rustd
 
 - **Client-API:** Anmeldung (Passwort, OIDC, GitHub, Google, LDAP), Adressbücher mit Tags und Freigaben, Gruppen, Online-Status, Verbindungs- und Dateiprotokolle
 - **Admin-Oberfläche** (`/_admin/`) auf **Deutsch** und Englisch (weitere: Französisch, Spanisch, Russisch, Koreanisch, Chinesisch): Benutzer, Geräte, Adressbücher, Gruppen, OAuth, Anmeldeprotokoll, Server-Befehle
-- **Web-Client** (abschaltbar mit `RUSTDESK_API_APP_WEB_CLIENT=0`)
 
 ### Änderungen gegenüber lejianwen
 
@@ -37,7 +38,6 @@ Alle Einstellungen aus `conf/config.yaml` lassen sich per Umgebungsvariable setz
 | `RUSTDESK_API_RUSTDESK_KEY_FILE` | Öffentlicher Server-Schlüssel (Standard `/data/id_ed25519.pub`) |
 | `RUSTDESK_API_JWT_KEY` | Signatur der Login-Tokens, nötig für `MUST_LOGIN`. **Nicht nachträglich ändern** |
 | `RUSTDESK_API_APP_TOKEN_EXPIRE` | Gültigkeit eines Logins (Standard `168h`) |
-| `RUSTDESK_API_APP_WEB_CLIENT` | `1` an, `0` aus |
 | `RUSTDESK_API_GIN_TRUST_PROXY` | Adresse/Bereich des Reverse Proxys (kommagetrennt, CIDR möglich) |
 | `RUSTDESK_API_APP_BAN_THRESHOLD` | IP-Sperre nach n Fehlversuchen (`0` = aus). Hinter einem Proxy nur mit `TRUST_PROXY` |
 | `RUSTDESK_API_APP_REGISTER` | Selbstregistrierung (`false` empfohlen) |
@@ -55,5 +55,5 @@ Die Admin-Oberfläche wird separat aus [rustdesk-api-web](https://github.com/MrM
 
 ## Herkunft und Lizenz
 
-- Ursprüngliches Projekt: [lejianwen/rustdesk-api](https://github.com/lejianwen/rustdesk-api) ([Beschreibung Chinesisch](README_ZH.md), [English](README_EN.md))
+- Ursprüngliches Projekt: [lejianwen/rustdesk-api](https://github.com/lejianwen/rustdesk-api)
 - Lizenz: [MIT](LICENSE)
