@@ -24,6 +24,11 @@ func NewJwt(key string, tokenExpireDuration time.Duration) *Jwt {
 }
 
 func (s *Jwt) GenerateToken(userId uint) string {
+	return s.GenerateTokenWithExpire(userId, s.TokenExpireDuration)
+}
+
+// GenerateTokenWithExpire signs a token with its own lifetime (e.g. short-lived web client tokens).
+func (s *Jwt) GenerateTokenWithExpire(userId uint, expire time.Duration) string {
 	if len(s.Key) == 0 {
 		fmt.Println("jwt key is nil")
 		return ""
@@ -32,7 +37,7 @@ func (s *Jwt) GenerateToken(userId uint) string {
 		UserClaims{
 			UserId: userId,
 			RegisteredClaims: jwt.RegisteredClaims{
-				ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.TokenExpireDuration)),
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(expire)),
 			},
 		})
 	token, err := t.SignedString(s.Key)

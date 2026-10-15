@@ -62,7 +62,7 @@ jobs:
           # reviewed state of the admin UI, pinned: never build whatever master is at the time
           repository: MrMarkus42/rustdesk-api-web
           path: rustdesk-api-web
-          ref: cba65c76bfa8a7eaa2f413870f1637490587f833
+          ref: fedd7d48065a34ebbe51d0a3009817e0e5eb8c4b
 
       - name: Set up Go environment
         uses: actions/setup-go@v4
@@ -140,6 +140,8 @@ jobs:
             ${{ matrix.job.goos}}-${{ matrix.job.platform }}.${{matrix.job.file_ext}}
 
       - name: Upload to GitHub Release
+        # test builds (tags with -rc) publish images only, no release
+        if: ${{ !contains(github.ref_name, '-rc') }}
         uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -221,6 +223,7 @@ jobs:
             debian-build/*.deb
 
       - name: Create Release
+        if: ${{ !contains(github.ref_name, '-rc') }}
         uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -270,6 +273,12 @@ jobs:
           else
             echo "TAG=latest" >> $GITHUB_ENV  # Default to 'latest' if not a tag
           fi
+          # Test builds (tags with -rc, e.g. v2.7.4-rc1) never move :latest
+          if [[ "${GITHUB_REF}" == refs/tags/*-rc* ]]; then
+            echo "LATEST_T=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "LATEST_T=${{ env.LATEST_TAG }}" >> $GITHUB_ENV
+          fi
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -300,12 +309,12 @@ jobs:
           build-args: |
             BUILDARCH=${{ matrix.job.platform }}
           tags: |
-            ${{ env.DOCKERHUB_IMAGE_NAMESPACE }}/rustdesk-api:${{ env.LATEST_TAG }}-${{ matrix.job.platform }},
+            ${{ env.DOCKERHUB_IMAGE_NAMESPACE }}/rustdesk-api:${{ env.LATEST_T }}-${{ matrix.job.platform }},
             ${{ env.DOCKERHUB_IMAGE_NAMESPACE }}/rustdesk-api:${{ env.TAG }}-${{ matrix.job.platform }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build and push Docker Full S6 image to Docker Hub ${{ matrix.job.platform }}
-        if: ${{ env.SKIP_DOCKER_HUB == 'false' }}  # Only run this step if SKIP_DOCKER_HUB is false
+        if: ${{ env.SKIP_DOCKER_HUB == 'false' && !contains(env.TAG, '-rc') }}  # Only run this step if SKIP_DOCKER_HUB is false
         uses: docker/build-push-action@v5
         with:
           context: "."
@@ -331,12 +340,12 @@ jobs:
           build-args: |
             BUILDARCH=${{ matrix.job.platform }}
           tags: |
-            ghcr.io/${{ env.GHCR_IMAGE_NAMESPACE }}/rustdesk-api:${{ env.LATEST_TAG }}-${{ matrix.job.platform }},
+            ghcr.io/${{ env.GHCR_IMAGE_NAMESPACE }}/rustdesk-api:${{ env.LATEST_T }}-${{ matrix.job.platform }},
             ghcr.io/${{ env.GHCR_IMAGE_NAMESPACE }}/rustdesk-api:${{ env.TAG }}-${{ matrix.job.platform }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build and push Docker Full S6 image to GHCR ${{ matrix.job.platform }}
-        if: ${{ env.SKIP_GHCR == 'false' }}  # Only run this step if SKIP_GHCR is false
+        if: ${{ env.SKIP_GHCR == 'false' && !contains(env.TAG, '-rc') }}  # Only run this step if SKIP_GHCR is false
         uses: docker/build-push-action@v5
         with:
           context: "."
@@ -363,6 +372,12 @@ jobs:
             echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
           else
             echo "TAG=latest" >> $GITHUB_ENV  # Default to 'latest' if not a tag
+          fi
+          # Test builds (tags with -rc, e.g. v2.7.4-rc1) never move :latest
+          if [[ "${GITHUB_REF}" == refs/tags/*-rc* ]]; then
+            echo "LATEST_T=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "LATEST_T=${{ env.LATEST_TAG }}" >> $GITHUB_ENV
           fi
 
       - name: Log in to Docker Hub
@@ -402,7 +417,7 @@ jobs:
           amend: true
 
       - name: Create and push manifest Docker Hub (:latest)
-        if: ${{ env.SKIP_DOCKER_HUB == 'false' }}
+        if: ${{ env.SKIP_DOCKER_HUB == 'false' && !contains(env.TAG, '-rc') }}
         uses: Noelware/docker-manifest-action@v0.2.3
         with:
           base-image: ${{ env.BASE_IMAGE_NAMESPACE }}/rustdesk-api:latest
@@ -412,7 +427,7 @@ jobs:
           push: true
 
       - name: Create and push manifest GHCR (:latest)
-        if: ${{ env.SKIP_GHCR == 'false' }}
+        if: ${{ env.SKIP_GHCR == 'false' && !contains(env.TAG, '-rc') }}
         uses: Noelware/docker-manifest-action@v0.2.3
         with:
           base-image: ghcr.io/${{ env.BASE_IMAGE_NAMESPACE }}/rustdesk-api:latest
@@ -423,7 +438,7 @@ jobs:
           amend: true
 
       - name: Create and push Full S6 manifest Docker Hub (:version)
-        if: ${{ env.SKIP_DOCKER_HUB == 'false' }}
+        if: ${{ env.SKIP_DOCKER_HUB == 'false' && !contains(env.TAG, '-rc') }}
         uses: Noelware/docker-manifest-action@v0.2.3
         with:
           base-image: ${{ env.BASE_IMAGE_NAMESPACE }}/rustdesk-api:full-s6
@@ -434,7 +449,7 @@ jobs:
           amend: true
 
       - name: Create and push Full S6 manifest GHCR (:latest)
-        if: ${{ env.SKIP_GHCR == 'false' }}
+        if: ${{ env.SKIP_GHCR == 'false' && !contains(env.TAG, '-rc') }}
         uses: Noelware/docker-manifest-action@v0.2.3
         with:
           base-image: ghcr.io/${{ env.BASE_IMAGE_NAMESPACE }}/rustdesk-api:full-s6

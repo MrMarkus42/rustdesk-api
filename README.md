@@ -9,6 +9,7 @@ Dieser Fork baut auf [lejianwen/rustdesk-api](https://github.com/lejianwen/rustd
 ## Funktionen
 
 - **Client-API:** Anmeldung (Passwort, OIDC, GitHub, Google, LDAP), Adressbücher mit Tags und Freigaben, Gruppen, Online-Status, Verbindungs- und Dateiprotokolle
+- **Web-Client** (eigene Entwicklung): Geräte direkt in der Admin-Oberfläche im Browser fernsteuern, Ende-zu-Ende-verschlüsselt, ohne zusätzliche Ports
 - **Admin-Oberfläche** (`/_admin/`) auf **Deutsch** und Englisch (weitere: Französisch, Spanisch, Russisch, Koreanisch, Chinesisch): Benutzer, Geräte, Adressbücher, Gruppen, OAuth, Anmeldeprotokoll, Server-Befehle
 
 ### Änderungen gegenüber lejianwen
@@ -41,7 +42,13 @@ Alle Einstellungen aus `conf/config.yaml` lassen sich per Umgebungsvariable setz
 | `RUSTDESK_API_GIN_TRUST_PROXY` | Adresse/Bereich des Reverse Proxys (kommagetrennt, CIDR möglich) |
 | `RUSTDESK_API_APP_BAN_THRESHOLD` | IP-Sperre nach n Fehlversuchen (`0` = aus). Hinter einem Proxy nur mit `TRUST_PROXY` |
 | `RUSTDESK_API_APP_REGISTER` | Selbstregistrierung (`false` empfohlen) |
+| `RUSTDESK_API_APP_WEB_CLIENT` | Web-Client in der Admin-Oberfläche (`1` = an, Standard; `0` = aus) |
+| `RUSTDESK_API_RUSTDESK_WS_ID_TARGET` / `…_WS_RELAY_TARGET` | WebSocket-Ports von hbbs/hbbr, zu denen die API den Web-Client weiterleitet (Standard `ws://127.0.0.1:21118` / `ws://127.0.0.1:21119`, passend für das s6-Image) |
 | `RUSTDESK_API_LANG` | Sprache der API-Meldungen ohne Browser-Angabe (Standard `en`) |
+
+### Web-Client
+
+Der Browser verbindet sich nur mit der API (`/webclient/ws/id` und `/webclient/ws/relay`); die API leitet intern an hbbs/hbbr weiter. Jede WebSocket-Verbindung braucht ein Einmal-Ticket (30 Sekunden gültig), das nur angemeldete Benutzer erhalten. Hinter einem Reverse Proxy muss dieser WebSocket-Verbindungen durchlassen (beim Nginx Proxy Manager: „Websockets Support“). Der Browser prüft die Identität des Geräts mit dem Server-Schlüssel und verschlüsselt die Sitzung Ende-zu-Ende; ohne Server-Schlüssel wird keine Verbindung aufgebaut.
 
 Admin-Passwort zurücksetzen: `./apimain reset-admin-pwd <neues-passwort>`
 

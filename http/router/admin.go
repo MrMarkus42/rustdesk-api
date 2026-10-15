@@ -50,6 +50,7 @@ func Init(g *gin.Engine) {
 
 	RustdeskCmdBind(adg)
 	DeviceGroupBind(adg)
+	WebClientBind(adg)
 	//访问静态文件
 	//g.StaticFS("/upload", http.Dir(global.Config.Gin.ResourcesPath+"/upload"))
 }
@@ -62,6 +63,13 @@ func RustdeskCmdBind(adg *gin.RouterGroup) {
 	rg.POST("/cmdDelete", cont.CmdDelete)
 	rg.POST("/cmdCreate", cont.CmdCreate)
 }
+func WebClientBind(rg *gin.RouterGroup) {
+	cont := &admin.WebClient{}
+	rg.GET("/webclient/config", cont.Config)
+	rg.POST("/webclient/ticket", cont.Ticket)
+	rg.GET("/webclient/peer", cont.Peer)
+}
+
 func LoginBind(rg *gin.RouterGroup) {
 	cont := &admin.Login{}
 	rg.POST("/login", cont.Login)

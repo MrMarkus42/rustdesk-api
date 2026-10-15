@@ -9,5 +9,6 @@ import (
 func WebInit(g *gin.Engine) {
 	i := &web.Index{}
 	g.GET("/", i.Index)
+	g.GET("/webclient/ws/:kind", (&web.WebClientWs{}).Proxy)
 	g.StaticFS("/_admin", gin.Dir(global.Config.Gin.ResourcesPath+"/admin", false))
 }

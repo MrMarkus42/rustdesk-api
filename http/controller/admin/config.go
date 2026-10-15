@@ -45,7 +45,7 @@ func (co *Config) ServerConfig(c *gin.Context) {
 // @Security token
 func (co *Config) AppConfig(c *gin.Context) {
 	response.Success(c, &gin.H{
-		"web_client": 0, // web client removed from this fork
+		"web_client": global.Config.App.WebClient,
 	})
 }
 

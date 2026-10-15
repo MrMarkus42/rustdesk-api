@@ -9,6 +9,7 @@ This fork is based on [lejianwen/rustdesk-api](https://github.com/lejianwen/rust
 ## Features
 
 - **Client API:** login (password, OIDC, GitHub, Google, LDAP), address books with tags and sharing, groups, online status, connection and file logs
+- **Web client** (own development): control devices in the browser right from the admin interface, end-to-end encrypted, no extra ports
 - **Admin interface** (`/_admin/`) in **German** and English (also French, Spanish, Russian, Korean, Chinese): users, devices, address books, groups, OAuth, login log, server commands
 
 ### Changes compared to lejianwen
@@ -41,7 +42,13 @@ Every setting in `conf/config.yaml` can be set via environment variable: prefix 
 | `RUSTDESK_API_GIN_TRUST_PROXY` | Address/range of the reverse proxy (comma-separated, CIDR allowed) |
 | `RUSTDESK_API_APP_BAN_THRESHOLD` | IP ban after n failed attempts (`0` = off). Behind a proxy only with `TRUST_PROXY` |
 | `RUSTDESK_API_APP_REGISTER` | Self-registration (`false` recommended) |
+| `RUSTDESK_API_APP_WEB_CLIENT` | Web client in the admin interface (`1` = on, default; `0` = off) |
+| `RUSTDESK_API_RUSTDESK_WS_ID_TARGET` / `…_WS_RELAY_TARGET` | WebSocket ports of hbbs/hbbr the API forwards the web client to (default `ws://127.0.0.1:21118` / `ws://127.0.0.1:21119`, right for the s6 image) |
 | `RUSTDESK_API_LANG` | Language of API messages when the browser sends none (default `en`) |
+
+### Web client
+
+The browser only talks to the API (`/webclient/ws/id` and `/webclient/ws/relay`); the API forwards internally to hbbs/hbbr. Every WebSocket needs a one-time ticket (valid for 30 seconds) that only logged-in users get. A reverse proxy in front must pass WebSockets (Nginx Proxy Manager: "Websockets Support"). The browser verifies the device with the server key and encrypts the session end to end; without a server key no connection is made.
 
 Reset the admin password: `./apimain reset-admin-pwd <new-password>`
 

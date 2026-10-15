@@ -18,6 +18,9 @@ type Rustdesk struct {
 	Key             string `mapstructure:"key"`
 	KeyFile         string `mapstructure:"key-file"`
 	Personal        int    `mapstructure:"personal"`
+	// WebSocket ports of hbbs/hbbr the web client is proxied to (default: same host)
+	WsIdTarget    string `mapstructure:"ws-id-target"`
+	WsRelayTarget string `mapstructure:"ws-relay-target"`
 }
 
 func (rd *Rustdesk) LoadKeyFile() {
