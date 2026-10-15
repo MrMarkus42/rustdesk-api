@@ -19,6 +19,7 @@ import (
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 	zh_tw_translations "github.com/go-playground/validator/v10/translations/zh_tw"
 	"reflect"
+	"strings"
 )
 
 func ApiInitValidator() {
@@ -73,12 +74,14 @@ func ApiInitValidator() {
 		panic(err)
 	}
 
+	// The label tags are Chinese only and showed up in error messages of every language;
+	// use the JSON field name instead (e.g. "username is a required field").
 	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
-		label := field.Tag.Get("label")
-		if label == "" {
+		name := strings.Split(field.Tag.Get("json"), ",")[0]
+		if name == "" || name == "-" {
 			return field.Name
 		}
-		return label
+		return name
 	})
 	Validator.Validate = validate
 	Validator.UT = uni // 存储 Universal Translator
