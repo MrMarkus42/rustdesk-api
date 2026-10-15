@@ -62,7 +62,7 @@ jobs:
           # reviewed state of the admin UI, pinned: never build whatever master is at the time
           repository: MrMarkus42/rustdesk-api-web
           path: rustdesk-api-web
-          ref: a0de0e698013e53c9750fff5ce9751fafbd930fd
+          ref: cba65c76bfa8a7eaa2f413870f1637490587f833
 
       - name: Set up Go environment
         uses: actions/setup-go@v4
