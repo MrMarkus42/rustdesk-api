@@ -134,7 +134,6 @@ func AddressBookBind(rg *gin.RouterGroup) {
 	aR := rg.Group("/address_book")
 	{
 		cont := &admin.AddressBook{}
-		aR.POST("/shareByWebClient", cont.ShareByWebClient)
 
 		arp := aR.Use(middleware.AdminPrivilege())
 		arp.GET("/list", cont.List)

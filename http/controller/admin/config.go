@@ -16,7 +16,7 @@ type Config struct {
 // ServerConfig RUSTDESK服务配置
 // @Tags ADMIN
 // @Summary RUSTDESK服务配置
-// @Description 服务配置,给webclient提供api-server
+// @Description 服务配置 (ID/relay/API server, key)
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} response.Response
@@ -45,7 +45,7 @@ func (co *Config) ServerConfig(c *gin.Context) {
 // @Security token
 func (co *Config) AppConfig(c *gin.Context) {
 	response.Success(c, &gin.H{
-		"web_client": global.Config.App.WebClient,
+		"web_client": 0, // web client removed from this fork
 	})
 }
 
