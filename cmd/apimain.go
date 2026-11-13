@@ -197,8 +197,8 @@ func InitGlobal() {
 	//jwt
 	//fmt.Println(global.Config.Jwt.PrivateKey)
 	// The JWT is the client's access token and cannot be extended like the DB token
-	// (app.token-expire). If it expired earlier, hbbs (--must-login) rejected connections
-	// while the client still looked logged in, so it never expires before the DB token.
+	// (app.token-expire). The API checks only its signature (RustAuth), but hbbs
+	// (--must-login) checks its expiry, so it never expires before the DB token.
 	jwtExpire := global.Config.Jwt.ExpireDuration
 	if global.Config.App.TokenExpire > jwtExpire {
 		jwtExpire = global.Config.App.TokenExpire

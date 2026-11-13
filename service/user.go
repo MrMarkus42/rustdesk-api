@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lejianwen/rustdesk-api/v2/config"
 	"github.com/lejianwen/rustdesk-api/v2/model"
 	"github.com/lejianwen/rustdesk-api/v2/utils"
 	"gorm.io/gorm"
@@ -493,14 +494,17 @@ func (us *UserService) getAdminUserCount() int64 {
 	return count
 }
 
+// tokenLifetime is app.token-expire, or the default when it is 0.
+func (us *UserService) tokenLifetime() time.Duration {
+	if exp := Config.App.TokenExpire; exp > 0 {
+		return exp
+	}
+	return config.DefaultTokenExpire
+}
+
 // UserTokenExpireTimestamp 生成用户token过期时间
 func (us *UserService) UserTokenExpireTimestamp() int64 {
-	exp := Config.App.TokenExpire
-	if exp == 0 {
-		//默认七天
-		exp = 7 * 24 * time.Hour
-	}
-	return time.Now().Add(exp).Unix()
+	return time.Now().Add(us.tokenLifetime()).Unix()
 }
 
 func (us *UserService) RefreshAccessToken(ut *model.UserToken) {
@@ -508,8 +512,10 @@ func (us *UserService) RefreshAccessToken(ut *model.UserToken) {
 	DB.Model(ut).Update("expired_at", ut.ExpiredAt)
 }
 
+// AutoRefreshAccessToken extends a token once less than a third of its lifetime is left,
+// so a login that is used regularly does not expire.
 func (us *UserService) AutoRefreshAccessToken(ut *model.UserToken) {
-	if ut.ExpiredAt-time.Now().Unix() < Config.App.TokenExpire.Milliseconds()/3000 {
+	if ut.ExpiredAt-time.Now().Unix() < int64(us.tokenLifetime()/3/time.Second) {
 		us.RefreshAccessToken(ut)
 	}
 }
@@ -520,6 +526,13 @@ func (us *UserService) BatchDeleteUserToken(ids []uint) error {
 
 func (us *UserService) VerifyJWT(token string) (uint, error) {
 	return Jwt.ParseToken(token)
+}
+
+// VerifyJWTSignature checks only that the token was signed with our key. For client
+// access tokens the user_tokens row decides whether the login is still valid, because
+// its expiry is extended on use while the expiry inside the JWT is fixed at login.
+func (us *UserService) VerifyJWTSignature(token string) (uint, error) {
+	return Jwt.ParseTokenSignature(token)
 }
 
 // IsUsernameExists 判断用户名是否存在, it will check the internal database and LDAP(if enabled)

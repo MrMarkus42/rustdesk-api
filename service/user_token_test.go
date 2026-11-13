@@ -7,13 +7,13 @@ import (
 	"github.com/lejianwen/rustdesk-api/v2/config"
 )
 
-func TestUserTokenExpireTimestampFallsBackToSevenDays(t *testing.T) {
+func TestUserTokenExpireTimestampFallsBackToDefault(t *testing.T) {
 	saved := Config
 	Config = &config.Config{}
 	t.Cleanup(func() { Config = saved })
 
 	got := (&UserService{}).UserTokenExpireTimestamp()
-	want := time.Now().Add(7 * 24 * time.Hour).Unix()
+	want := time.Now().Add(config.DefaultTokenExpire).Unix()
 	if got < want-5 || got > want+5 {
 		t.Errorf("expiry = %d, want about %d", got, want)
 	}

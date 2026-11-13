@@ -32,8 +32,8 @@ func TestInitMissingKeysGetDefaults(t *testing.T) {
 			if c.App.CaptchaThreshold != 3 {
 				t.Errorf("app.captcha-threshold = %d, want 3", c.App.CaptchaThreshold)
 			}
-			if c.App.TokenExpire != 168*time.Hour {
-				t.Errorf("app.token-expire = %v, want 168h", c.App.TokenExpire)
+			if c.App.TokenExpire != DefaultTokenExpire {
+				t.Errorf("app.token-expire = %v, want %v", c.App.TokenExpire, DefaultTokenExpire)
 			}
 		})
 	}

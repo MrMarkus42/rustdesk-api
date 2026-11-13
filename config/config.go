@@ -11,6 +11,9 @@ const (
 	DebugMode     = "debug"
 	ReleaseMode   = "release"
 	DefaultConfig = "conf/config.yaml"
+	// DefaultTokenExpire is how long a login stays valid without being used;
+	// every use extends it (see UserService.AutoRefreshAccessToken).
+	DefaultTokenExpire = 30 * 24 * time.Hour
 )
 
 type App struct {
@@ -70,7 +73,7 @@ func Init(rowVal *Config, path string) *viper.Viper {
 	// An older config.yaml lacks these, and their zero values break logins.
 	// Don't default from conf/config.yaml: much of it is placeholders.
 	v.SetDefault("app.captcha-threshold", 3)
-	v.SetDefault("app.token-expire", "168h")
+	v.SetDefault("app.token-expire", DefaultTokenExpire)
 	v.SetConfigFile(path)
 	v.SetConfigType("yaml")
 	err := v.ReadInConfig()

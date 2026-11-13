@@ -49,9 +49,20 @@ func (s *Jwt) GenerateTokenWithExpire(userId uint, expire time.Duration) string 
 }
 
 func (s *Jwt) ParseToken(tokenString string) (uint, error) {
+	return s.parse(tokenString)
+}
+
+// ParseTokenSignature checks the signature but not the expiry, for callers that keep
+// the validity of the token elsewhere (the user_tokens table for client logins).
+func (s *Jwt) ParseTokenSignature(tokenString string) (uint, error) {
+	return s.parse(tokenString, jwt.WithoutClaimsValidation())
+}
+
+func (s *Jwt) parse(tokenString string, opts ...jwt.ParserOption) (uint, error) {
+	opts = append(opts, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return s.Key, nil
-	})
+	}, opts...)
 	if err != nil {
 		return 0, err
 	}
