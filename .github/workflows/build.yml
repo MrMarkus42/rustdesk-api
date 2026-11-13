@@ -62,12 +62,12 @@ jobs:
           # reviewed state of the admin UI, pinned: never build whatever master is at the time
           repository: MrMarkus42/rustdesk-api-web
           path: rustdesk-api-web
-          ref: fedd7d48065a34ebbe51d0a3009817e0e5eb8c4b
+          ref: 234791e7023423969d7dfb90055fe17a8c686fc4
 
       - name: Set up Go environment
         uses: actions/setup-go@v4
         with:
-          go-version: '1.27.3'  # exact: a plain '1.27' may resolve to an older cached patch release (1.27.3: crypto/x509 GO-2026-6809)
+          go-version: '1.27.4'  # exact: a plain '1.27' may resolve to an older cached patch release (1.27.4: net/http GO-2026-6859)
 
       - name: Set up npm
         uses: actions/setup-node@v2
