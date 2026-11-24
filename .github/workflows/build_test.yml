@@ -72,8 +72,9 @@ jobs:
           mkdir -p ../resources/admin/
           cp -ar dist/* ../resources/admin/
 
-      - name: tidy
-        run: go mod tidy
+      - name: verify modules
+        # go.sum is committed: verify it instead of letting go mod tidy rewrite it
+        run: go mod download && go mod verify
 
       - name: swag
         run: |
